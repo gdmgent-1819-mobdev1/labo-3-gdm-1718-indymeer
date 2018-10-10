@@ -14,19 +14,19 @@ console.log(people);
 
 
 let like_button = new Array();
-console.log(like_button, 'like');
 localStorage.setItem("like", JSON.stringify(like_button));
-let store = JSON.parse(localStorage.getItem(like_button));
 
 
 let dislike_button = new Array();
-console.log(dislike_button, 'dislike');
 localStorage.setItem("dislike", JSON.stringify(dislike_button));
 
-
+//fetch id for buttons
 var bad = document.getElementById("nope");
 var good = document.getElementById("like");
 var next = document.getElementById("next");
+var close = document.getElementById("close");
+var close2 = document.getElementById("close2");
+
 
 
 
@@ -83,10 +83,14 @@ bad.addEventListener("click", function (event) {
 
     let array = JSON.parse(localStorage.getItem('test'));
 
+    /*
+    Volgende  regels zijn aangepast, i was nergens geinstantieerd
+    index ook niet, de naam array voor een persoon is ook niet zo fraai
+    currentProfile is ook niet bereikbaar in deze functie daarom logt die niet
+    */
 
 
-
-    array = people[index + 1];
+    array = people[index];
 
     dislike_button.push(people[index]);
     //people.shift(1);
@@ -117,7 +121,13 @@ good.addEventListener("click", function (event) {
 
     let array = JSON.parse(localStorage.getItem('test'));
 
-    array = people[index + 1];
+    /*
+    Volgende  regels zijn aangepast, i was nergens geinstantieerd
+    index ook niet, de naam array voor een persoon is ook niet zo fraai
+    currentProfile is ook niet bereikbaar in deze functie daarom logt die niet
+    */
+
+    array = people[index];
 
     like_button.push(people[index]);
     //people.shift(1);
@@ -141,14 +151,31 @@ good.addEventListener("click", function (event) {
 
 //show list
 next.addEventListener("click", function () {
+    document.getElementById("overlay2").style.transform = "translateX(0%)";
+
     document.getElementById("text2").innerHTML = "";
+    
     for (i = 0; i < like_button.length; i++) {
         document.getElementById("text2").innerHTML += like_button[i].name + '<br>';
 
     }
 })
 
+
+close.addEventListener("click", function () {
+     document.getElementById("overlay1").style.transform = "translateX(-100%)";
+     document.getElementById("overlay2").style.transform = "translateX(100%)";
+
+
+})
+close2.addEventListener("click", function () {
+    document.getElementById("overlay2").style.transform = "translateX(100%)";
+
+
+})
+
 previous.addEventListener("click", function () {
+    document.getElementById("overlay1").style.transform = "translateX(0%)";
     document.getElementById("text1").innerHTML = "";
     for (i = 0; i < dislike_button.length; i++) {
         document.getElementById("text1").innerHTML += dislike_button[i].name + '<br>';
@@ -202,12 +229,11 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             quote.className = "quote";
             quote.id = "quote";
 
-            let person = people[0]
 
 
-            li.style.background = 'url(' + person.picture + ')';
-            span.innerHTML = person.name;
-            quote.innerHTML = "age" + " " + person.age;
+            li.style.background = 'url(' + authors.picture.large + ')';
+            span.innerHTML = authors.name.first + authors.name.last;
+            quote.innerHTML = "age" + " " + authors.dob.age;
 
 
             append(info, quote);
