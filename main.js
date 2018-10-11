@@ -6,6 +6,10 @@ function append(parent, el) {
     return parent.appendChild(el);
 }
 
+// MAP 
+
+
+
 // lege arrays om te storen
 
 let people = new Array();
@@ -54,6 +58,7 @@ function fetchData() {
                     picture: authors.picture.large,
                     age: authors.dob.age
                 }
+                
                 people.push(allPeople);
 
             }
@@ -83,13 +88,6 @@ bad.addEventListener("click", function (event) {
 
     let array = JSON.parse(localStorage.getItem('test'));
 
-    /*
-    Volgende  regels zijn aangepast, i was nergens geinstantieerd
-    index ook niet, de naam array voor een persoon is ook niet zo fraai
-    currentProfile is ook niet bereikbaar in deze functie daarom logt die niet
-    */
-
-
     array = people[index];
 
     dislike_button.push(people[index]);
@@ -97,7 +95,7 @@ bad.addEventListener("click", function (event) {
 
     //console.log(index)
     //console.log(array.name)
-    renderNewPerson(array)
+    renderNewPerson(array);
 
     //console.log(currentProfile.name);
     console.log(index);
@@ -121,12 +119,6 @@ good.addEventListener("click", function (event) {
 
     let array = JSON.parse(localStorage.getItem('test'));
 
-    /*
-    Volgende  regels zijn aangepast, i was nergens geinstantieerd
-    index ook niet, de naam array voor een persoon is ook niet zo fraai
-    currentProfile is ook niet bereikbaar in deze functie daarom logt die niet
-    */
-
     array = people[index];
 
     like_button.push(people[index]);
@@ -149,39 +141,77 @@ good.addEventListener("click", function (event) {
 })
 
 
-//show list
+//show list like
 next.addEventListener("click", function () {
     document.getElementById("overlay2").style.transform = "translateX(0%)";
 
+    displayLike();
+
+})
+
+function displayLike(){
     document.getElementById("text2").innerHTML = "";
-    
-    for (i = 0; i < like_button.length; i++) {
-        document.getElementById("text2").innerHTML += like_button[i].name + '<br>';
+   
+    // var switchLike = document.querySelectorAll("#move1");
+ 
+     for (i = 0; i < like_button.length; i++) {
+ 
+         document.getElementById("text2").innerHTML +=  '<a href="#" class="close" id="move1" onclick="switchDislike(' + i + ')" >'+ like_button[i].name +'</a> <br>';
+ 
+ 
+     }
+}
 
-    }
-})
+function switchDislike(index){
+    dislike_button.push(like_button[index]);
+            like_button.splice(index, 1);
+            displayLike();
+}
 
 
-close.addEventListener("click", function () {
-     document.getElementById("overlay1").style.transform = "translateX(-100%)";
-     document.getElementById("overlay2").style.transform = "translateX(100%)";
+// dislike buttons
 
 
-})
-close2.addEventListener("click", function () {
-    document.getElementById("overlay2").style.transform = "translateX(100%)";
-
-
-})
 
 previous.addEventListener("click", function () {
     document.getElementById("overlay1").style.transform = "translateX(0%)";
-    document.getElementById("text1").innerHTML = "";
-    for (i = 0; i < dislike_button.length; i++) {
-        document.getElementById("text1").innerHTML += dislike_button[i].name + '<br>';
-
-    }
+   
+     displayDislike();
+    
 })
+
+function displayDislike(){
+    document.getElementById("text1").innerHTML = "";
+   
+    // var switchLike = document.querySelectorAll("#move1");
+ 
+     for (i = 0; i < dislike_button.length; i++) {
+ 
+         document.getElementById("text1").innerHTML +=  '<a href="#" class="close" id="move1" onclick="switchLike(' + i + ')" >'+ dislike_button[i].name +'</a> <br>';
+ 
+ 
+     }
+}
+
+function switchLike(index){
+    like_button.push(dislike_button[index]);
+            dislike_button.splice(index, 1);
+            displayDislike();
+}
+
+// set remove button
+close.addEventListener("click", function () {
+    document.getElementById("overlay1").style.transform = "translateX(-100%)";
+
+})
+close2.addEventListener("click", function () {
+   document.getElementById("overlay2").style.transform = "translateX(100%)";
+
+
+})
+
+// switch from like to dislike and from dislike to like
+
 
 // create elements plus insert json
 
@@ -204,8 +234,13 @@ fetch('https://randomuser.me/api?results=10').then(response => {
                 picture: authors.picture.large,
                 age: authors.dob.age
             }
-            people.push(allPeople);
+            
+          if (like_button.includes(authors.login.uuid) || dislike_button.includes(authors.login.uuid)){
+            continue;
+        }else{
+          people.push(allPeople);
 
+        }
             ul.innerHTML = "";
             let li = createNode('div');
             let span = createNode('span');
