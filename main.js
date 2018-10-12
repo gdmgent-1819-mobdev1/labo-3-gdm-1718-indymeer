@@ -10,6 +10,63 @@ function append(parent, el) {
 
 
 
+document.addEventListener('load', function() {
+    setupMap();
+    getPosition();
+    }, setTimeout(setupMap, 300),
+    true);
+    
+    var map = null;
+    
+    function setupMap() {
+      mapboxgl.accessToken = 'pk.eyJ1IjoiaW5keW1lZXJtYW5zIiwiYSI6ImNqbjRqOWkydjNrM2Qza284cWJtNGIzMmMifQ.n1bFi7TfjO65EtziFqnpeA';
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v9',
+        center: [-74.50, 40], 
+        zoom: 1 , 
+        paint: {
+            'circle-radius': 12,
+            'circle-color': '#486DE0'
+          }
+      });
+    }
+
+
+    
+    function getPosition() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          let lat = position.coords.latitude,
+              lng = position.coords.longitude,
+              latlng = [lng, lat];
+              localStorage.setItem("coord", JSON.stringify(latlng));
+
+    
+          var marker = new mapboxgl.Marker()
+          .setLngLat(latlng)
+          .addTo(map);
+    
+          map.flyTo({
+            center: latlng,
+            zoom: 11
+          });
+        });
+      }
+    }
+
+/*
+    if(existsLocal('coords_client')) {
+        let coords = JSON.parse(getLocal('coords_client'));
+        initMap(coords.lat, coords.lng);
+    } else {
+        getPosition().then((coords) => {
+            setLocal('coords_client', JSON.stringify(coords));
+            initMap(coords.lat, coords.lng);
+        })
+        // initMap(coords.lat, coords.lng);
+    }
+    */
 // lege arrays om te storen
 
 let people = new Array();
@@ -48,6 +105,7 @@ function fetchData() {
         return response.json();
     }).then(data => {
         function create() {
+            
             for (let i = 0; i < 10; i++) {
                 let authors = data.results[i];
                 localStorage.setItem('test', JSON.stringify(authors));
@@ -56,9 +114,17 @@ function fetchData() {
                 let allPeople = {
                     name: authors.name.first + authors.name.last,
                     picture: authors.picture.large,
-                    age: authors.dob.age
+                    age: authors.dob.age,
+                    city: authors.location.city,
+                    coordinates: [
+                        [person.lng, person.lat],
+                        [home.lng, home.lat]
+                    ]
+
                 }
-                
+                let person = JSON.parse('coords_client');
+                let home = JSON.parse('coord');
+
                 people.push(allPeople);
 
             }
@@ -73,9 +139,10 @@ function renderNewPerson(person) {
     var image = document.getElementById("personImage")
     var userName = document.getElementById("username")
     var quote = document.getElementById("quote")
-    image.style.background = 'url(' + person.picture + ')'
-    userName.innerHTML = person.name
-    quote.innerHTML = "age" + " " + person.age
+    image.style.background = 'url(' + person.picture + ')';
+    userName.innerHTML = person.name;
+    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city + " " + person.lat + 'km';
+    
 
 
 }
@@ -87,6 +154,7 @@ bad.addEventListener("click", function (event) {
     event.preventDefault();
 
     let array = JSON.parse(localStorage.getItem('test'));
+
 
     array = people[index];
 
@@ -114,7 +182,7 @@ bad.addEventListener("click", function (event) {
 good.addEventListener("click", function (event) {
     event.preventDefault();
     console.log("good button clicked")
-
+   
 
 
     let array = JSON.parse(localStorage.getItem('test'));
@@ -231,8 +299,11 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 
             let allPeople = {
                 name: authors.name.first + authors.name.last,
-                picture: authors.picture.large,
-                age: authors.dob.age
+                    picture: authors.picture.large,
+                    age: authors.dob.age,
+                    city: authors.location.city,
+                   lat: authors.location.coordinates.latitude, 
+                    lng: authors.location.coordinates.longitude
             }
             
           if (like_button.includes(authors.login.uuid) || dislike_button.includes(authors.login.uuid)){
@@ -243,6 +314,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
         }
             ul.innerHTML = "";
             let li = createNode('div');
+            let image = createNode('div');
             let span = createNode('span');
             let info = document.createElement('div');
             let quote = createNode('div');
@@ -253,10 +325,12 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 
             info.id = "personInfo"
 
+            image.className = "user-image";
             li.className = "user-image";
-            li.id = "user-image";
 
-            li.id = "personImage"
+            image.id = "user-image";
+
+            image.id = "personImage"
 
             span.className = "username";
             span.id = "username";
@@ -265,17 +339,19 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             quote.id = "quote";
 
 
-
-            li.style.background = 'url(' + authors.picture.large + ')';
+            li.innerHTML = "    <div id='map'></div>  "
+            image.style.background = 'url(' + authors.picture.large + ')';
             span.innerHTML = authors.name.first + authors.name.last;
-            quote.innerHTML = "age" + " " + authors.dob.age;
+            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city + " " + /*distance*/ +'km';
 
 
             append(info, quote);
+            append(li, image);
             append(li, span);
             append(ul, li);
             append(ul, info);
-        }
+        }    
+
     }
     create();
 
@@ -285,7 +361,3 @@ fetch('https://randomuser.me/api?results=10').then(response => {
     console.log(error.message);
 });
 
-
-function element() {
-
-}
