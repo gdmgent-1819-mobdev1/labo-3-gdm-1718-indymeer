@@ -8,112 +8,17 @@ function append(parent, el) {
 
 
 
-// MAP 
-
-
-
-document.addEventListener('load', function() {
-    setupMap();
-    getPosition();
-    }, setTimeout(setupMap, 300),
-    true);
-    
-    var map = null;
-    
-    function setupMap(lat, lng) {
-      mapboxgl.accessToken = 'pk.eyJ1IjoiaW5keW1lZXJtYW5zIiwiYSI6ImNqbjRqOWkydjNrM2Qza284cWJtNGIzMmMifQ.n1bFi7TfjO65EtziFqnpeA';
-      map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v9',
-        center: [people[0].longitude, people[0].latitude], 
-        zoom: 3 , 
-        
-      });
-    }
-
-
-    
-    function getPosition() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          let lat = position.coords.latitude,
-              lng = position.coords.longitude,
-              latlng = [lng, lat];
-              console.log(lat);
-              localStorage.setItem("coords", JSON.stringify(latlng));
-
-    
-          var marker = new mapboxgl.Marker()
-          .setLngLat(latlng)
-          .addTo(map);
-    
-          map.flyTo({
-            center: latlng,
-            zoom: 11
-          });
-          /*map.addLayer({
-            'id': mapid,
-            'type': 'circle',
-            'source': {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [dest.coords.lng, dest.coords.lat],
-                    }
-                },
-            },
-            'paint': {
-                'circle-color': color,
-                'circle-radius': {
-                    'base': 10,
-                    'stops': [[9, 35], [12, 40], [22, 180]]
-                },
-                'circle-opacity': 0.5
-            }
-        });*/
-        });
-      }
-    }
-
-
-    function degreesToRadians(degrees) {
-		return degrees * Math.PI / 180;
-	  }
-
-	function showPosition(position) {
-		let Lat = position.coords.latitude;
-		let Long = position.coords.longitude;
-		let Long2 = people[index].longitude;
-		let Lat2 = people[index].latitude;
-		let R = 6371e3; // metres
-		let φ1 = degreesToRadians(Lat);
-		let φ2 = degreesToRadians(Lat2);
-		let Δφ = degreesToRadians(Lat2-Lat);
-		let Δλ = degreesToRadians(Long2-Long);
-		let a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-				Math.cos(φ1) * Math.cos(φ2) *
-				Math.sin(Δλ/2) * Math.sin(Δλ/2);
-		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		let d = document.getElementById("quote");
-		d.innerHTML = 'Uw match bevind zich op ' + R * c + ' Meter afstand';
-
-	} 
-
-
-
 // lege arrays om te storen
 
 let people = new Array();
 console.log(people);
 
 
-
+// like array
 let like_button = new Array();
 localStorage.setItem("like", JSON.stringify(like_button));
 
-
+//dislike array
 let dislike_button = new Array();
 localStorage.setItem("dislike", JSON.stringify(dislike_button));
 
@@ -129,9 +34,7 @@ var close2 = document.getElementById("close2");
 
 // buttons
 
-/**
-volgende regels zijn toegevoegd
-*/
+//fetch nieuwe data wanneer er op next gedrukt wordt
 var index = 0;
 
 function fetchData() {
@@ -153,13 +56,10 @@ function fetchData() {
                     picture: authors.picture.large,
                     age: authors.dob.age,
                     city: authors.location.city,
-                    longitude: authors.location.coordinates.longitude ,
-                    latitude:  authors.location.coordinates.latitude
+                    lng: authors.location.coordinates.longitude ,
+                    lat:  authors.location.coordinates.latitude
                 }
                    
-
-             
-            
 
                 people.push(allPeople);
 
@@ -170,6 +70,8 @@ function fetchData() {
 
 }
 
+
+// functie om nieuwe persoon te genereren
 function renderNewPerson(person) {
     console.log("Rendering: " + person.name + ". to do implement")
     var image = document.getElementById("personImage")
@@ -177,7 +79,7 @@ function renderNewPerson(person) {
     var quote = document.getElementById("quote")
     image.style.background = 'url(' + person.picture + ')';
     userName.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + person.name  ;
-    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city + " " + person.lat + 'km';
+    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city ;
     
 
 
@@ -185,6 +87,7 @@ function renderNewPerson(person) {
 /*TOT HIER*/
 
 
+// dislike button
 
 bad.addEventListener("click", function (event) {
     event.preventDefault();
@@ -195,13 +98,8 @@ bad.addEventListener("click", function (event) {
     array = people[index];
 
     dislike_button.push(people[index]);
-    //people.shift(1);
 
-    //console.log(index)
-    //console.log(array.name)
     renderNewPerson(array);
-
-    //console.log(currentProfile.name);
     console.log(index);
     if (index >= 9) {
         index = 0;
@@ -215,6 +113,9 @@ bad.addEventListener("click", function (event) {
 })
 
 
+
+// like button
+
 good.addEventListener("click", function (event) {
     event.preventDefault();
     console.log("good button clicked")
@@ -226,10 +127,7 @@ good.addEventListener("click", function (event) {
     array = people[index];
 
     like_button.push(people[index]);
-    //people.shift(1);
 
-    //console.log(index)
-    //console.log(array.name)
     renderNewPerson(array);
 
     //console.log(currentProfile.name);
@@ -273,9 +171,10 @@ function switchDislike(index){
 }
 
 
-// dislike buttons
 
 
+
+// show list dislike 
 
 previous.addEventListener("click", function () {
     document.getElementById("overlay1").style.transform = "translateX(0%)";
@@ -314,7 +213,7 @@ close2.addEventListener("click", function () {
 
 })
 
-// switch image to corner on click
+// switch image to corner on mapicon click
 
 
 function iconButton() {
@@ -326,7 +225,7 @@ function iconButton() {
 
 
 
-// create elements plus insert json
+// create elements plus insert json : beginnende array 
 
 const ul = document.getElementById('main-window');
 
@@ -347,8 +246,8 @@ fetch('https://randomuser.me/api?results=10').then(response => {
                     picture: authors.picture.large,
                     age: authors.dob.age,
                     city: authors.location.city,
-                    longitude: authors.location.coordinates.longitude ,
-                    latitude:  authors.location.coordinates.latitude
+                   lat: authors.location.coordinates.latitude, 
+                    lng: authors.location.coordinates.longitude
             }
             
           if (like_button.includes(authors.login.uuid) || dislike_button.includes(authors.login.uuid)){
@@ -387,7 +286,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             li.innerHTML = "    <div id='map'></div>  "
             image.style.background = 'url(' + authors.picture.large + ')';
             span.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + authors.name.first + authors.name.last;
-            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city + " " + /*distance*/ +'km';
+            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city ;
 
 
             append(info, quote);
@@ -407,3 +306,93 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 });
 
 
+
+// MAP
+
+
+document.addEventListener('load', function() {
+    setupMap();
+    getPosition();
+    }, setTimeout(setupMap, 300), //settimeout omdat hij anders de div map niet vindt
+    true);
+    
+    
+    function setupMap() {
+      mapboxgl.accessToken = 'pk.eyJ1IjoiaW5keW1lZXJtYW5zIiwiYSI6ImNqbjRqOWkydjNrM2Qza284cWJtNGIzMmMifQ.n1bFi7TfjO65EtziFqnpeA';
+     var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v9',
+       center: [people[index].lng, people[index].lat],  //index is ingesteld als standaardwaarde 0
+       
+        zoom: 1 
+       
+      });
+    }
+    
+
+
+    
+    function getPosition() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          let lat = position.coords.latitude,
+              lng = position.coords.longitude,
+              latlng = [lng, lat];
+              localStorage.setItem("coord", JSON.stringify(latlng));
+
+    
+          var marker = new mapboxgl.Marker()
+          .setLngLat(latlng)
+          .addTo(map);
+    
+          map.flyTo({
+            center: latlng,
+            zoom: 11
+            
+          });
+          
+            map.addSource("geomarker", {
+                type: "geojson",
+                data: {
+                  type: "Feature",
+                  geometry: {
+                    type: "Point",
+                    coordinates: [long, lat]
+                  }
+                }
+        });
+        
+        map.addLayer({
+            "id": "point",
+            "type": "circle",
+            "source": "point",
+            "paint": {
+                "circle-radius": 8,
+                "circle-color": "#000"
+            }
+        });
+        });
+      }
+    }
+
+
+    // script van https://www.movable-type.co.uk/scripts/latlong.html
+    
+    function showPosition(position) {
+		let Lat = position.coords.latitude;
+		let Long = position.coords.longitude;
+		let Long2 = person[0].longitude;
+		let Lat2 = person[0].latitude;
+		let R = 6371e3; // metres
+		let φ1 = degreesToRadians(Lat);
+		let φ2 = degreesToRadians(Lat2);
+		let Δφ = degreesToRadians(Lat2-Lat);
+		let Δλ = degreesToRadians(Long2-Long);
+		let a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+				Math.cos(φ1) * Math.cos(φ2) *
+				Math.sin(Δλ/2) * Math.sin(Δλ/2);
+		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		let d = document.getElementById("quote");
+		let result = Math.round(R * c/1000);
+		d.innerHTML =  result + 'km';
+	}
