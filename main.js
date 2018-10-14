@@ -39,6 +39,7 @@ document.addEventListener('load', function() {
           let lat = position.coords.latitude,
               lng = position.coords.longitude,
               latlng = [lng, lat];
+              console.log(lat);
               localStorage.setItem("coords", JSON.stringify(latlng));
 
     
