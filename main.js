@@ -20,17 +20,14 @@ document.addEventListener('load', function() {
     
     var map = null;
     
-    function setupMap() {
+    function setupMap(lat, lng) {
       mapboxgl.accessToken = 'pk.eyJ1IjoiaW5keW1lZXJtYW5zIiwiYSI6ImNqbjRqOWkydjNrM2Qza284cWJtNGIzMmMifQ.n1bFi7TfjO65EtziFqnpeA';
       map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
-        center: [-74.50, 40], 
-        zoom: 1 , 
-        paint: {
-            'circle-radius': 12,
-            'circle-color': '#486DE0'
-          }
+        center: [people[0].longitude, people[0].latitude], 
+        zoom: 3 , 
+        
       });
     }
 
@@ -42,7 +39,7 @@ document.addEventListener('load', function() {
           let lat = position.coords.latitude,
               lng = position.coords.longitude,
               latlng = [lng, lat];
-              localStorage.setItem("coord", JSON.stringify(latlng));
+              localStorage.setItem("coords", JSON.stringify(latlng));
 
     
           var marker = new mapboxgl.Marker()
@@ -53,22 +50,58 @@ document.addEventListener('load', function() {
             center: latlng,
             zoom: 11
           });
+          /*map.addLayer({
+            'id': mapid,
+            'type': 'circle',
+            'source': {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [dest.coords.lng, dest.coords.lat],
+                    }
+                },
+            },
+            'paint': {
+                'circle-color': color,
+                'circle-radius': {
+                    'base': 10,
+                    'stops': [[9, 35], [12, 40], [22, 180]]
+                },
+                'circle-opacity': 0.5
+            }
+        });*/
         });
       }
     }
 
-/*
-    if(existsLocal('coords_client')) {
-        let coords = JSON.parse(getLocal('coords_client'));
-        initMap(coords.lat, coords.lng);
-    } else {
-        getPosition().then((coords) => {
-            setLocal('coords_client', JSON.stringify(coords));
-            initMap(coords.lat, coords.lng);
-        })
-        // initMap(coords.lat, coords.lng);
-    }
-    */
+
+    function degreesToRadians(degrees) {
+		return degrees * Math.PI / 180;
+	  }
+
+	function showPosition(position) {
+		let Lat = position.coords.latitude;
+		let Long = position.coords.longitude;
+		let Long2 = people[index].longitude;
+		let Lat2 = people[index].latitude;
+		let R = 6371e3; // metres
+		let φ1 = degreesToRadians(Lat);
+		let φ2 = degreesToRadians(Lat2);
+		let Δφ = degreesToRadians(Lat2-Lat);
+		let Δλ = degreesToRadians(Long2-Long);
+		let a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+				Math.cos(φ1) * Math.cos(φ2) *
+				Math.sin(Δλ/2) * Math.sin(Δλ/2);
+		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		let d = document.getElementById("quote");
+		d.innerHTML = 'Uw match bevind zich op ' + R * c + ' Meter afstand';
+
+	} 
+
+
+
 // lege arrays om te storen
 
 let people = new Array();
@@ -98,7 +131,7 @@ var close2 = document.getElementById("close2");
 /**
 volgende regels zijn toegevoegd
 */
-var index = 0
+var index = 0;
 
 function fetchData() {
     people = new Array()
@@ -119,7 +152,8 @@ function fetchData() {
                     picture: authors.picture.large,
                     age: authors.dob.age,
                     city: authors.location.city,
-                 
+                    longitude: authors.location.coordinates.longitude ,
+                    latitude:  authors.location.coordinates.latitude
                 }
                    
 
@@ -312,8 +346,8 @@ fetch('https://randomuser.me/api?results=10').then(response => {
                     picture: authors.picture.large,
                     age: authors.dob.age,
                     city: authors.location.city,
-                   lat: authors.location.coordinates.latitude, 
-                    lng: authors.location.coordinates.longitude
+                    longitude: authors.location.coordinates.longitude ,
+                    latitude:  authors.location.coordinates.latitude
             }
             
           if (like_button.includes(authors.login.uuid) || dislike_button.includes(authors.login.uuid)){
@@ -370,4 +404,5 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 }).catch(function (error) {
     console.log(error.message);
 });
+
 
