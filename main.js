@@ -6,6 +6,8 @@ function append(parent, el) {
     return parent.appendChild(el);
 }
 
+
+
 // MAP 
 
 
@@ -109,6 +111,7 @@ function fetchData() {
             for (let i = 0; i < 10; i++) {
                 let authors = data.results[i];
                 localStorage.setItem('test', JSON.stringify(authors));
+                
 
 
                 let allPeople = {
@@ -116,14 +119,12 @@ function fetchData() {
                     picture: authors.picture.large,
                     age: authors.dob.age,
                     city: authors.location.city,
-                    coordinates: [
-                        [person.lng, person.lat],
-                        [home.lng, home.lat]
-                    ]
-
+                 
                 }
-                let person = JSON.parse('coords_client');
-                let home = JSON.parse('coord');
+                   
+
+             
+            
 
                 people.push(allPeople);
 
@@ -140,7 +141,7 @@ function renderNewPerson(person) {
     var userName = document.getElementById("username")
     var quote = document.getElementById("quote")
     image.style.background = 'url(' + person.picture + ')';
-    userName.innerHTML = person.name;
+    userName.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + person.name  ;
     quote.innerHTML = "age" + " " + person.age + '<br>'+person.city + " " + person.lat + 'km';
     
 
@@ -278,7 +279,16 @@ close2.addEventListener("click", function () {
 
 })
 
-// switch from like to dislike and from dislike to like
+// switch image to corner on click
+
+
+function iconButton() {
+
+    let element = document.getElementById("personImage");
+    element.classList.toggle("user-image2");
+
+}
+
 
 
 // create elements plus insert json
@@ -341,7 +351,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 
             li.innerHTML = "    <div id='map'></div>  "
             image.style.background = 'url(' + authors.picture.large + ')';
-            span.innerHTML = authors.name.first + authors.name.last;
+            span.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + authors.name.first + authors.name.last;
             quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city + " " + /*distance*/ +'km';
 
 
