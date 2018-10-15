@@ -66,6 +66,9 @@ function fetchData() {
             }
         }
         create()
+        getPosition();
+
+        showPosition();
     })
 
 }
@@ -98,6 +101,8 @@ bad.addEventListener("click", function (event) {
     array = people[index];
 
     dislike_button.push(people[index]);
+    setupMap();
+
 
     renderNewPerson(array);
     console.log(index);
@@ -129,6 +134,8 @@ good.addEventListener("click", function (event) {
     like_button.push(people[index]);
 
     renderNewPerson(array);
+    setupMap();
+
 
     //console.log(currentProfile.name);
     console.log(index);
@@ -298,6 +305,10 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 
     }
     create();
+    
+    setupMap();
+    getPosition();
+    showPosition();
 
 
 
@@ -310,11 +321,6 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 // MAP
 
 
-document.addEventListener('load', function() {
-    setupMap();
-    getPosition();
-    }, setTimeout(setupMap, 300), //settimeout omdat hij anders de div map niet vindt
-    true);
     
     
     function setupMap() {
@@ -324,7 +330,7 @@ document.addEventListener('load', function() {
         style: 'mapbox://styles/mapbox/streets-v9',
        center: [people[index].lng, people[index].lat],  //index is ingesteld als standaardwaarde 0
        
-        zoom: 1 
+        zoom: 3
        
       });
     }
@@ -377,9 +383,14 @@ document.addEventListener('load', function() {
 
 
     // script van https://www.movable-type.co.uk/scripts/latlong.html
-    
-    function showPosition(position) {
-		let Lat = position.coords.latitude;
+    function degreesToRadians(degrees) {
+		return degrees * Math.PI / 180;
+	  }
+
+
+    function showPosition() {
+
+        let Lat = position.coords.latitude;
 		let Long = position.coords.longitude;
 		let Long2 = person[0].longitude;
 		let Lat2 = person[0].latitude;
@@ -394,5 +405,5 @@ document.addEventListener('load', function() {
 		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 		let d = document.getElementById("quote");
 		let result = Math.round(R * c/1000);
-		d.innerHTML =  result + 'km';
+        d.innerHTML =  result + 'km';        
 	}

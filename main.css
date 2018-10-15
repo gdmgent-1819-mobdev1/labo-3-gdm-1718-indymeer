@@ -310,7 +310,7 @@ body {
   position: absolute;
   transform: translateX(-100%);
   z-index: 777;
-  transition: linear .7s;
+  transition: linear .4s;
   left: 0;
 
 }
@@ -323,7 +323,7 @@ body {
   position: absolute;
   transform: translateX(100%);
   z-index: 777;
-  transition: linear .7s;
+  transition: linear .4s;
   right: 0;
 
 }
