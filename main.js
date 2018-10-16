@@ -67,8 +67,10 @@ function fetchData() {
         }
         create()
         getPosition();
+        setupMap();
 
-        showPosition();
+
+
     })
 
 }
@@ -76,13 +78,15 @@ function fetchData() {
 
 // functie om nieuwe persoon te genereren
 function renderNewPerson(person) {
+    let array = JSON.parse(localStorage.getItem('distance'));
+
     console.log("Rendering: " + person.name + ". to do implement")
     var image = document.getElementById("personImage")
     var userName = document.getElementById("username")
     var quote = document.getElementById("quote")
     image.style.background = 'url(' + person.picture + ')';
     userName.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + person.name  ;
-    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city ;
+    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city + " " + array + "km" ;
     
 
 
@@ -263,6 +267,8 @@ fetch('https://randomuser.me/api?results=10').then(response => {
           people.push(allPeople);
 
         }
+        let array = JSON.parse(localStorage.getItem('distance'));
+
             ul.innerHTML = "";
             let li = createNode('div');
             let image = createNode('div');
@@ -293,7 +299,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             li.innerHTML = "    <div id='map'></div>  "
             image.style.background = 'url(' + authors.picture.large + ')';
             span.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + authors.name.first + authors.name.last;
-            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city ;
+            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city + " " + array + "km";
 
 
             append(info, quote);
@@ -308,7 +314,6 @@ fetch('https://randomuser.me/api?results=10').then(response => {
     
     setupMap();
     getPosition();
-    showPosition();
 
 
 
@@ -333,6 +338,33 @@ fetch('https://randomuser.me/api?results=10').then(response => {
         zoom: 3
        
       });
+      map.on('load', function(){
+        let radius=80; //radius of the circle
+        map.addSource("geomarker", { //making a source for the radius
+            "type": "geojson",
+            "data": {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": {
+                "type": "Point",
+                "coordinates": [people[index].lng, people[index].lat] 
+                }
+            }]
+            }
+        });
+        map.addLayer({ //displaying the radius of the circle
+            "id": "geomarker",
+            "type": "circle",
+            "source": "geomarker",
+            "paint": {
+            "circle-radius": radius, //radius with the variable radius
+            "circle-color": "#3BBB87", //color
+            "circle-opacity": 0.5, //opacity
+            }
+        });
+    });
+
     }
     
 
@@ -341,15 +373,13 @@ fetch('https://randomuser.me/api?results=10').then(response => {
     function getPosition() {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function (position) {
-          let lat = position.coords.latitude,
-              lng = position.coords.longitude,
-              latlng = [lng, lat];
+          let lat2 = position.coords.latitude,
+              lng2 = position.coords.longitude,
+              latlng = [lng2, lat2];
               localStorage.setItem("coord", JSON.stringify(latlng));
-
     
           var marker = new mapboxgl.Marker()
           .setLngLat(latlng)
-          .addTo(map);
     
           map.flyTo({
             center: latlng,
@@ -357,29 +387,8 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             
           });
           
-            map.addSource("geomarker", {
-                type: "geojson",
-                data: {
-                  type: "Feature",
-                  geometry: {
-                    type: "Point",
-                    coordinates: [long, lat]
-                  }
-                }
-        });
-        
-        map.addLayer({
-            "id": "point",
-            "type": "circle",
-            "source": "point",
-            "paint": {
-                "circle-radius": 8,
-                "circle-color": "#000"
-            }
-        });
-        });
-      }
-    }
+           
+   
 
 
     // script van https://www.movable-type.co.uk/scripts/latlong.html
@@ -388,10 +397,10 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 	  }
 
 
-    function showPosition() {
 
-        let Lat = position.coords.latitude;
-		let Long = position.coords.longitude;
+        
+        let Lat = lat2;
+		let Long = lng2;
 		let Long2 = person[0].longitude;
 		let Lat2 = person[0].latitude;
 		let R = 6371e3; // metres
@@ -403,7 +412,14 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 				Math.cos(φ1) * Math.cos(φ2) *
 				Math.sin(Δλ/2) * Math.sin(Δλ/2);
 		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		let d = document.getElementById("quote");
 		let result = Math.round(R * c/1000);
-        d.innerHTML =  result + 'km';        
-	}
+     //   document.getElementById('quote').innerHTML +='<p> +'+Lat+' km';  
+        localStorage.setItem("distance", JSON.stringify(result));
+
+    
+});
+
+
+}
+
+}
