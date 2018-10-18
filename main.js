@@ -66,7 +66,6 @@ function fetchData() {
             }
         }
         create()
-        getPosition();
         setupMap();
 
 
@@ -86,9 +85,10 @@ function renderNewPerson(person) {
     var quote = document.getElementById("quote")
     image.style.background = 'url(' + person.picture + ')';
     userName.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + person.name  ;
-    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city + " " + array + "km" ;
+    quote.innerHTML = "age" + " " + person.age + '<br>'+person.city ;
     
 
+      
 
 }
 /*TOT HIER*/
@@ -105,10 +105,13 @@ bad.addEventListener("click", function (event) {
     array = people[index];
 
     dislike_button.push(people[index]);
-    setupMap();
 
 
     renderNewPerson(array);
+
+    setupMap();
+    distanceKm();
+
     console.log(index);
     if (index >= 9) {
         index = 0;
@@ -139,6 +142,7 @@ good.addEventListener("click", function (event) {
 
     renderNewPerson(array);
     setupMap();
+    distanceKm();
 
 
     //console.log(currentProfile.name);
@@ -299,7 +303,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             li.innerHTML = "    <div id='map'></div>  "
             image.style.background = 'url(' + authors.picture.large + ')';
             span.innerHTML = '<a href=# class="fas fa-map-marker-alt" id="mapIcon" onclick="iconButton()"></a>' + authors.name.first + authors.name.last;
-            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city + " " + array + "km";
+            quote.innerHTML = "age" + " " + authors.dob.age +'<br>' + authors.location.city ;
 
 
             append(info, quote);
@@ -325,7 +329,7 @@ fetch('https://randomuser.me/api?results=10').then(response => {
 
 // MAP
 
-
+let i;
     
     
     function setupMap() {
@@ -333,14 +337,28 @@ fetch('https://randomuser.me/api?results=10').then(response => {
      var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
-       center: [people[index].lng, people[index].lat],  //index is ingesteld als standaardwaarde 0
+       //center: [people[index].lng, people[index].lat],  //index is ingesteld als standaardwaarde 0
        
         zoom: 3
        
       });
+      map.flyTo({
+        center:[people[index].lng, people[index].lat],
+             // These options control the ending camera position: centered at
+        // the target, at zoom level 9, and north up.
+        zoom: 9,
+        bearing: 0,
+
+        // These options control the flight curve, making it move
+        // slowly and zoom out almost completely before starting
+        // to pan.
+        speed: 0.7, // make the flying slow
+        curve: 1, // change the speed at which it zooms out
+
+    });
       map.on('load', function(){
         let radius=80; //radius of the circle
-        map.addSource("geomarker", { //making a source for the radius
+        map.addSource("geomarker" +i, { //making a source for the radius
             "type": "geojson",
             "data": {
             "type": "FeatureCollection",
@@ -354,17 +372,19 @@ fetch('https://randomuser.me/api?results=10').then(response => {
             }
         });
         map.addLayer({ //displaying the radius of the circle
-            "id": "geomarker",
+            "id": "geomarker" +i ,
             "type": "circle",
-            "source": "geomarker",
+            "source": "geomarker" +i,
             "paint": {
             "circle-radius": radius, //radius with the variable radius
             "circle-color": "#3BBB87", //color
             "circle-opacity": 0.5, //opacity
             }
         });
-    });
+    i++;
+    })
 
+     
     }
     
 
@@ -379,47 +399,34 @@ fetch('https://randomuser.me/api?results=10').then(response => {
               localStorage.setItem("coord", JSON.stringify(latlng));
     
           var marker = new mapboxgl.Marker()
-          .setLngLat(latlng)
-    
-          map.flyTo({
-            center: latlng,
-            zoom: 11
-            
-          });
-          
-           
-   
-
-
-    // script van https://www.movable-type.co.uk/scripts/latlong.html
-    function degreesToRadians(degrees) {
-		return degrees * Math.PI / 180;
-	  }
-
-
-
-        
-        let Lat = lat2;
-		let Long = lng2;
-		let Long2 = person[0].longitude;
-		let Lat2 = person[0].latitude;
-		let R = 6371e3; // metres
-		let φ1 = degreesToRadians(Lat);
-		let φ2 = degreesToRadians(Lat2);
-		let Δφ = degreesToRadians(Lat2-Lat);
-		let Δλ = degreesToRadians(Long2-Long);
-		let a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-				Math.cos(φ1) * Math.cos(φ2) *
-				Math.sin(Δλ/2) * Math.sin(Δλ/2);
-		let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		let result = Math.round(R * c/1000);
-     //   document.getElementById('quote').innerHTML +='<p> +'+Lat+' km';  
-        localStorage.setItem("distance", JSON.stringify(result));
-
+          .setLngLat(latlng);
     
 });
+distanceKm();
 
+      }
 
 }
+// code om de afstand te berekenen
 
-}
+function distanceKm() {
+    let array = JSON.parse(localStorage.getItem('coord'));
+
+    let  lat1 = array[0];
+    let lon1 = array[1];
+    let lat2 =  people[index].lat;
+    let lon2 = people[index].lng;
+    var R = 6371; // Radius of the earth in km
+    var dLat = (lat2 - lat1) * Math.PI / 180;  // deg2rad below
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = 
+       0.5 - Math.cos(dLat)/2 + 
+       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+       (1 - Math.cos(dLon))/2;
+       document.getElementById('quote').innerHTML += " " +  Math.ceil(R * 2 * Math.asin(Math.sqrt(a))) + "km";
+
+   
+  }
+
+
+ 

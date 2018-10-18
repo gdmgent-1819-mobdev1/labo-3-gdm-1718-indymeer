@@ -303,7 +303,7 @@ body {
 }
 
 #overlay1{
-  background-color: #d4d3cc;
+  background-color: #fbfbfb;
   width: 50%;
   height: 100%;
   margin: 0 auto;
@@ -315,8 +315,15 @@ body {
 
 }
 
+#overlay1 h3, #overlay2 h3{
+  text-align: center;
+  background: linear-gradient(to right, #fd297b -7%, #ff655b 100%);
+  padding: 30px;
+  color: #fff;
+} 
+
 #overlay2{
-  background-color: #d4d3cc;
+  background-color: #fbfbfb;
   width: 50%;
   height: 100%;
   margin: 0 auto;
@@ -334,7 +341,8 @@ body {
   right: 5px;
   text-decoration: none;
   text-shadow: 0 1px 0 #fff;
-  top: 5px;
+  top: 10px;
+  
 }
 [class*='close'], [class*='close2'] {
   color: #777;
@@ -349,7 +357,7 @@ body {
 }
 
 .close:after, .close2:after {
-  content: '✖'; /* UTF-8 symbol */
+  content: ' ✖'; /* UTF-8 symbol */
 }
 
 #text1{
